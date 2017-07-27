@@ -211,5 +211,5 @@ def ToSentences(paragraph, include_token=True):
   Returns:
     List of sentence strings.
   """
-  s_gen = SnippetGen(paragraph, SENTENCE_START, SENTENCE_END, include_token)
+  s_gen = SnippetGen(str(paragraph), SENTENCE_START, SENTENCE_END, include_token)
   return [s for s in s_gen]
