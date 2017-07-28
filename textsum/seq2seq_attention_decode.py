@@ -23,6 +23,8 @@ import data
 from six.moves import xrange
 import tensorflow as tf
 
+gpu_options = tf.GPUOptions(memory_growth=True)
+
 FLAGS = tf.app.flags.FLAGS
 tf.app.flags.DEFINE_integer('max_decode_steps', 1000000,
                             'Number of decoding steps.')
@@ -95,7 +97,7 @@ class BSDecoder(object):
 
   def DecodeLoop(self):
     """Decoding loop for long running process."""
-    sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
+    sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True, gpu_options=gpu_options))
     step = 0
     while step < FLAGS.max_decode_steps:
       time.sleep(DECODE_LOOP_DELAY_SECS)

@@ -30,6 +30,10 @@ import data
 import seq2seq_attention_decode
 import seq2seq_attention_model
 
+# Added to make gpu not to consume all of the memory
+gpu_options = tf.GPUOptions(allow_growth=True)
+#device_count = {'GPU': 0}
+  
 FLAGS = tf.app.flags.FLAGS
 tf.app.flags.DEFINE_string('data_path',
                            '', 'Path expression to tf.Example.')
@@ -95,7 +99,7 @@ def _Train(model, data_batcher):
                              save_model_secs=FLAGS.checkpoint_secs,
                              global_step=model.global_step)
     sess = sv.prepare_or_wait_for_session(config=tf.ConfigProto(
-        allow_soft_placement=True))
+        allow_soft_placement=True, gpu_options=gpu_options))
     running_avg_loss = 0
     step = 0
     while not sv.should_stop() and step < FLAGS.max_run_steps:
@@ -120,7 +124,7 @@ def _Eval(model, data_batcher, vocab=None):
   model.build_graph()
   saver = tf.train.Saver()
   summary_writer = tf.summary.FileWriter(FLAGS.eval_dir)
-  sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
+  sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True, gpu_options=gpu_options))
   running_avg_loss = 0
   step = 0
   while True:
@@ -172,12 +176,12 @@ def main(unused_argv):
   hps = seq2seq_attention_model.HParams(
       mode=FLAGS.mode,  # train, eval, decode
       min_lr=0.01,  # min learning rate.
-      lr=0.15,  # learning rate
+      lr=0.1,  # learning rate; was 0.15
       batch_size=batch_size,
-      enc_layers=4,
-      enc_timesteps=120,
-      dec_timesteps=30,
-      min_input_len=2,  # discard articles/summaries < than this
+      enc_layers=2, # was 4
+      enc_timesteps=60, # was 120
+      dec_timesteps=15, # was 30
+      min_input_len=1,  # discard articles/summaries < than this; was 2
       num_hidden=256,  # for rnn cell
       emb_dim=128,  # If 0, don't use embedding
       max_grad_norm=2,
