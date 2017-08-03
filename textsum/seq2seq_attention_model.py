@@ -188,6 +188,11 @@ class Seq2SeqAttentionModel(object):
           loop_function = _extract_argmax_and_embed(
               embedding, (w, v), update_embedding=False)
 
+	# try to train without teacher forcing:
+        if hps.mode == 'train':
+          loop_function = _extract_argmax_and_embed(
+              embedding, (w, v), update_embedding=True)
+
         cell = tf.contrib.rnn.LSTMCell(
             hps.num_hidden,
             initializer=tf.random_uniform_initializer(-0.1, 0.1, seed=113),
@@ -252,6 +257,7 @@ class Seq2SeqAttentionModel(object):
       grads, global_norm = tf.clip_by_global_norm(
           tf.gradients(self._loss, tvars), hps.max_grad_norm)
     tf.summary.scalar('global_norm', global_norm)
+    #optimizer = tf.train.AdamOptimizer()
     optimizer = tf.train.GradientDescentOptimizer(self._lr_rate)
     tf.summary.scalar('learning rate', self._lr_rate)
     self._train_op = optimizer.apply_gradients(

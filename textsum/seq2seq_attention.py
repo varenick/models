@@ -169,23 +169,23 @@ def main(unused_argv):
   assert vocab.CheckVocab(data.SENTENCE_START) > 0
   assert vocab.CheckVocab(data.SENTENCE_END) > 0
 
-  batch_size = 4
+  batch_size = 16
   if FLAGS.mode == 'decode':
     batch_size = FLAGS.beam_size
 
   hps = seq2seq_attention_model.HParams(
       mode=FLAGS.mode,  # train, eval, decode
-      min_lr=0.01,  # min learning rate.
-      lr=0.1,  # learning rate; was 0.15
+      min_lr=0.01,  # min learning rate. was 0.01
+      lr=0.15,  # learning rate; was 0.15
       batch_size=batch_size,
-      enc_layers=2, # was 4
-      enc_timesteps=60, # was 120
-      dec_timesteps=15, # was 30
+      enc_layers=1, # was 4
+      enc_timesteps=10, # was 120
+      dec_timesteps=10, # was 30
       min_input_len=1,  # discard articles/summaries < than this; was 2
-      num_hidden=256,  # for rnn cell
-      emb_dim=128,  # If 0, don't use embedding
+      num_hidden=128,  # for rnn cell; was 256
+      emb_dim=256,  # If 0, don't use embedding; was 128
       max_grad_norm=2,
-      num_softmax_samples=4096)  # If 0, no sampled softmax.
+      num_softmax_samples=0)  # If 0, no sampled softmax.
 
   batcher = batch_reader.Batcher(
       FLAGS.data_path, vocab, hps, FLAGS.article_key,

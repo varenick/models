@@ -23,7 +23,7 @@ import data
 from six.moves import xrange
 import tensorflow as tf
 
-gpu_options = tf.GPUOptions(memory_growth=True)
+gpu_options = tf.GPUOptions(allow_growth=True)
 
 FLAGS = tf.app.flags.FLAGS
 tf.app.flags.DEFINE_integer('max_decode_steps', 1000000,
