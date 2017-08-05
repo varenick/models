@@ -2,7 +2,7 @@
     --mode=decode \
     --article_key=text \
     --abstract_key=summary \
-    --data_path=data/decode_food_test \
+    --data_path=data/decode_food_test_full \
     --vocab_path=data/vocab_food \
     --log_root=log_food_test \
     --num_gpus=1 \

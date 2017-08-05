@@ -28,6 +28,10 @@ HParams = namedtuple('HParams',
                      'min_input_len, num_hidden, emb_dim, max_grad_norm, '
                      'num_softmax_samples')
 
+import pickle
+
+with open('embedding_matrix.pkl', 'rb') as f:
+  init_embedding = pickle.load(f)
 
 def _extract_argmax_and_embed(embedding, output_projection=None,
                               update_embedding=True):
@@ -150,6 +154,12 @@ class Seq2SeqAttentionModel(object):
         embedding = tf.get_variable(
             'embedding', [vsize, hps.emb_dim], dtype=tf.float32,
             initializer=tf.truncated_normal_initializer(stddev=1e-4))
+
+	# Use 300d GloVe instead of learning embeddings from scratch:
+        #embedding = tf.get_variable(
+        #    'embedding', dtype=tf.float32,
+        #    initializer=init_embedding)
+
         emb_encoder_inputs = [tf.nn.embedding_lookup(embedding, x)
                               for x in encoder_inputs]
         emb_decoder_inputs = [tf.nn.embedding_lookup(embedding, x)
@@ -189,9 +199,9 @@ class Seq2SeqAttentionModel(object):
               embedding, (w, v), update_embedding=False)
 
 	# try to train without teacher forcing:
-        if hps.mode == 'train':
-          loop_function = _extract_argmax_and_embed(
-              embedding, (w, v), update_embedding=True)
+        #if hps.mode == 'train':
+        #  loop_function = _extract_argmax_and_embed(
+        #      embedding, (w, v), update_embedding=True)
 
         cell = tf.contrib.rnn.LSTMCell(
             hps.num_hidden,
@@ -248,17 +258,20 @@ class Seq2SeqAttentionModel(object):
     """Sets self._train_op, op to run for training."""
     hps = self._hps
 
+    #self._lr_rate = tf.maximum(
+    #    hps.min_lr,  # min_lr_rate.
+    #    tf.train.exponential_decay(hps.lr, self.global_step, 30000, 0.98))
     self._lr_rate = tf.maximum(
         hps.min_lr,  # min_lr_rate.
-        tf.train.exponential_decay(hps.lr, self.global_step, 30000, 0.98))
+        tf.train.exponential_decay(hps.lr, self.global_step, 3000, 0.98))
 
     tvars = tf.trainable_variables()
     with tf.device(self._get_gpu(self._num_gpus-1)):
       grads, global_norm = tf.clip_by_global_norm(
           tf.gradients(self._loss, tvars), hps.max_grad_norm)
     tf.summary.scalar('global_norm', global_norm)
-    #optimizer = tf.train.AdamOptimizer()
-    optimizer = tf.train.GradientDescentOptimizer(self._lr_rate)
+    optimizer = tf.train.AdamOptimizer()
+    #optimizer = tf.train.GradientDescentOptimizer(self._lr_rate)
     tf.summary.scalar('learning rate', self._lr_rate)
     self._train_op = optimizer.apply_gradients(
         zip(grads, tvars), global_step=self.global_step, name='train_step')

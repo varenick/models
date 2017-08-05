@@ -2,7 +2,7 @@
     --mode=eval \
     --article_key=text \
     --abstract_key=summary \
-    --data_path=data/eval_food_test \
+    --data_path=data/eval_food_test_full \
     --vocab_path=data/vocab_food \
     --log_root=log_food_test \
     --eval_dir=log_food_test/eval \

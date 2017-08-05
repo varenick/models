@@ -1,0 +1,67 @@
+One-word repetition test; no sampled softmax:
+
+teacher-forcing	true		true
+optimizer	gd		gd
+enc_layers	1		2
+num_hidden	128		128
+emb_dim		64		64
+train_loss	<0.5		<2
+eval_loss	<0.5e-3		<0.1
+decode_accuracy	0.88		0.69
+unk_portion	0.05		0.06
+empty_portion	0.0		0.13
+
+Three-word repetition test; no sampled softmax:
+
+teacher-forcing	true		true		true		true		true		true		false
+optimizer	gd		gd		gd		gd		gd		gd		gd
+enc_layers	1		2		1		1		1		1		1
+num_hidden	128		128		128		256		128		128		128
+emb_dim		64		64		128		128		256		512		256
+train_loss	<2		<1.5		<1.5		<0.5		<1.5		<1		<0.5
+eval_loss	<2		<2		<1.5		<2.5		<2		<1.5		<1.5
+decode_accuracy	0.53		0.47		0.59		0.28		0.73		0.57		0.64
+unk_portion	0.04		0.04		0.04		0.03		0.05		0.05		0.04
+empty_portion	0.0		0.0		0.0		0.0		0.0		0.0		0.0
+
+Summary repetition test; no sampled softmax:
+
+teacher-forcing	true		false
+optimizer	gd		gd
+enc_layers	1		1
+num_hidden	128		128
+emb_dim		256		256
+train_loss	<0.5		<1
+eval_loss	0.2		<0.5
+decode_accuracy	0.5		0.61
+unk_portion	0.03		0.02
+empty_portion	0.0		0.0
+
+Summarization on Amazon Food Reviews; no sampled softmax:
+
+teacher-forcing	true		false
+optimizer	gd		gd
+enc_layers	1		1
+num_hidden	128		128
+emb_dim		256		256
+train_loss			3 - 5
+eval_loss			4 - 6
+decode_accuracy			0.04
+unk_portion			0.07
+empty_portion			0.01
+
+Summarization on Amazon Food Reviews; short part; no sampled softmax:
+
+embeddings	learned		learned		GloVe
+teacher-forcing	true		true -> false	true
+optimizer	gd		gd		gd
+enc_layers	1		1		1
+num_hidden	128		128		128
+emb_dim		256		256		300
+train_loss	1.5 - 2		2 - 3		2
+eval_loss	3 - 4		3.5 - 4		3.2
+decode_accuracy	0.14		0.14		0.1
+unk_portion	0.03		0.04		0.03
+empty_portion	0.0		0.0		0.06
+
+
